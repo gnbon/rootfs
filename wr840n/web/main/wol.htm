@@ -1,0 +1,21 @@
+﻿<script language="javascript" type="text/javascript">var wolList;var param=new Object();function wakeUp(i){$.act(ACT_SET,WOL_ITEM,wolList[i].__stack,null,["mac="+wolList[i].mac]);$.addLoading($.id("sav"+i));$.exe(function(err){if(!err){$.loadMain("wol.htm")}})}function deleteItem(i){$.act(ACT_DEL,WOL_ITEM,wolList[i].__stack,null);$.addLoading($.id("del"+i));$.exe(function(err){if(!err){$.loadMain("wol.htm")}})}function init(){if($.mainParam){if($.mainParam.mac){$.id("wolMac").value=$.mainParam.mac}if($.mainParam.name){$.id("pcName").value=$.mainParam.name}}wolList=$.act(ACT_GL,WOL_ITEM,null,null,["mac","name"]);$.exe(function(err){if(!err){var tbl=$.id("hostTbl");var row,cell;var brName;if(wolList.length==0){return}row=tbl.insertRow(-1);cell=row.insertCell(-1);cell.width="8%";cell.innerHTML="No";cell=row.insertCell(-1);cell.innerHTML="PC 설명";cell=row.insertCell(-1);cell.innerHTML="MAC 주소";cell.width="35%";cell=row.insertCell(-1);cell.innerHTML="관리";cell.width="30%";for(var i=0;i<wolList.length;i++){row=tbl.insertRow(-1);cell=row.insertCell(-1);cell.width="8%";cell.innerHTML=i+1;cell=row.insertCell(-1);cell.innerHTML=wolList[i].name;cell=row.insertCell(-1);cell.width="35%";cell.innerHTML=wolList[i].mac;cell=row.insertCell(-1);cell.innerHTML='<input type="button" class="button" style="width:60px" value="켜기" id="sav'+i+'" onclick="wakeUp('+i+')"/><input type="button" class="button" style="width:60px" value="삭제" id="del'+i+'" onclick="deleteItem('+i+')" />';cell.width="30%"}$.resize($.id("hostTbl"),8)}})}function doSubmit(){if(wolList.length>=100){alert("The max number of items is 100!");return false}if($.mac($.id("wolMac").value)){element=$.id("wolMac");if(element){element.focus();element.select()}return false}if($.id("pcName").value==""){alert("PC 이름이 비어 있지 않아야 합니다!");element=$.id("pcName");if(element){element.focus();element.select()}return false}$.act(ACT_ADD,WOL_ITEM,null,null,["mac="+$.id("wolMac").value,"name="+$.id("pcName").value]);$.addLoading($.id("saveBtn"));$.exe(function(err){if(!err){$.loadMain("wol.htm")}})}function cloneMac(){$.id("wolMac").value=clientMac}function wolScan(){param.mac=$.id("wolMac").value;param.name=$.id("pcName").value;$.loadMain("wolScan.htm",param)};</script>
+<p class="et">WOL 설정</p>
+<div class="con1 L">
+<p class="ct"></p>
+<p class="bl"></p>
+<div class="con2">
+
+
+<p class="L2"><b class="item M T" id="t_hostmac">MAC 주소</b><input type="text" class="text" size="17" maxlength="17" id="wolMac" value="00:00:00:00:00:00"/>
+<input id="clonemac" class="button T" style="width:150px" type="button" value="MAC 주소를 복제" onclick="cloneMac();"/></p>
+<p class="L2"><b class="item M T" id="t_pcname">PC 설명</b><input type="text" class="text" size="17" maxlength="20" id="pcName" />
+<input id="scan" class="button T" style="width:150px" type="button" value="스캔" onclick="wolScan();"/></p>
+</div>
+<p class="tail" id="tail"><input type="button" class="button L T T_save" value="Add" id="saveBtn" onclick="doSubmit();" /></p>
+<p class="bl"></p>
+</div>
+<p class="br"></p>
+<div class="XL thead" ><table class="XL bdr tc">
+<div class="XL tbody"><table id="hostTbl" class="XL bdr tc"></table></table></div>
+</div>
+<script language="javascript" type="text/javascript">$.loadHelpFrame("WolHelpRpm.htm");init();</script>

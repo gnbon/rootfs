@@ -1,0 +1,36 @@
+﻿<script language="javascript" type="text/javascript">var sdmzCfg;var dmzCfg;function init(){if($.mainParam){if($.mainParam.mac){$.id("sdmzMac").value=$.mainParam.mac}$.id("sdmz_en").checked=true;dmzCfg.mac=$.mainParam.mac;dmzCfg.enabled=1}else{dmzCfg=$.act(ACT_GET,DMZ_HOST_CFG,null,null);if(INCLUDE_NEW_SDMZ){sdmzCfg=$.act(ACT_GET,NEW_SDMZ_CFG,null,null)}else{sdmzCfg=$.act(ACT_GET,SDMZ_CFG,null,null)}if(!$.exe()){$.id("dmzIp").value=dmzCfg.IPAddress?dmzCfg.IPAddress:"0.0.0.0";$.id("sdmzMac").value=sdmzCfg.mac?sdmzCfg.mac:"00:00:00:00:00:00";$.id("dmz_en").checked=(dmzCfg.enable=="1"&&sdmzCfg.enable=="0")?1:0;$.id("sdmz_en").checked=(sdmzCfg.enable=="1"&&dmzCfg.enable=="0")?1:0;$.id("dmz_dis").checked=(dmzCfg.enable=="1"||sdmzCfg.enable=="1")?0:1}}if($.id("dmz_en").checked){$.removeClass($.id("p_dmz"),"nd");$.addClass($.id("p_sdmz"),"nd")}if($.id("sdmz_en").checked){$.addClass($.id("p_dmz"),"nd");$.removeClass($.id("p_sdmz"),"nd")}if($.id("dmz_dis").checked){$.addClass($.id("p_dmz"),"nd");$.addClass($.id("p_sdmz"),"nd")}}function checkConflictFtp(){var ftpServer=$.act(ACT_GET,FTP_SERVER,null,null,null);if($.exe()){return}if((ftpServer.enable==1)&&(ftpServer.accessFromInternet==1)){if(confirm(c_str.forwarding_ftp_conflict)){$.act(ACT_SET,FTP_SERVER,null,null,["accessFromInternet=0"]);$.exe();return true}else{$.reload();return false}}return true}function checkMacConflict(sdmzMac){var staticIpList=$.act(ACT_GL,LAN_DHCP_STATIC_ADDR);var isConflict=false;if(!$.exe()){for(var i=0;i<staticIpList.length;i++){if(staticIpList[i].chaddr.toUpperCase()==sdmzMac.toUpperCase()){isConflict=true;break}}return isConflict}}function doSubmit(){var sdmzSta=($.id("sdmz_en").checked==1)?1:0;var dmzSta=($.id("dmz_en").checked==1)?1:0;var tmpMac=$.id("sdmzMac").value;var tmpIp=$.ip2ip($.id("dmzIp").value);var bReboot=false;if($.ifip($.id("dmzIp").value,true)){if(dmzSta){$.alert(ERR_IP_FORMAT);var element=$.id("dmzIp");if(element){element.focus();element.select()}return}else{tmpIp=0}}if($.mac($.id("sdmzMac").value,true)!=0){if(sdmzSta){$.alert(ERR_MAC_FORMAT);var element=$.id("sdmzMac");if(element){element.focus();element.select()}return}else{tmpMac=0}}if(sdmzSta&&checkMacConflict(tmpMac)==true){alert("Mac 주소가 주소예약(Address Reservation)과 충돌합니다.  충돌하는 주소예약 내역을 먼저 삭제해 주시기 바랍니다.");return}if(sdmzSta!=sdmzCfg.enable||tmpMac!=sdmzCfg.mac){bReboot=true}if(bReboot){if(!confirm("공유기가 재시작 될 때까지 적용되지 않습니다. 공유기를 재시작 하려면 확인을 클릭합니다.")){return}}$.addLoading($.id("saveBtn"));if(sdmzSta){if(INCLUDE_NEW_SDMZ){$.act(ACT_SET,NEW_SDMZ_CFG,null,null,["enable="+sdmzSta,"Mac="+tmpMac])}else{$.act(ACT_SET,SDMZ_CFG,null,null,["enable="+sdmzSta,"Mac="+tmpMac])}}else{if(INCLUDE_NEW_SDMZ){$.act(ACT_SET,NEW_SDMZ_CFG,null,null,["enable="+sdmzSta])}else{$.act(ACT_SET,SDMZ_CFG,null,null,["enable="+sdmzSta])}}if(dmzSta){$.act(ACT_SET,DMZ_HOST_CFG,null,null,["enable="+dmzSta,"IPAddress="+tmpIp])}else{if(dmzCfg.enable=="1"){$.act(ACT_SET,DMZ_HOST_CFG,null,null,["enable="+dmzSta])}}if(bReboot){$.act(ACT_OP,ACT_OP_REBOOT);$.exe(true);$.guage(["<span class='T T_rebooting'>"+s_str.rebooting+"</span>","<span class='T T_wait_reboot'>"+s_str.wait_reboot+"</span>",],100,1200,function(){$.loadMain("dmz.htm")})}else{$.exe(function(ret){if(!ret){$.loadMain("dmz.htm")}})}}function cloneMac(){$.id("sdmzMac").value=clientMac}function cloneIp(){$.id("dmzIp").value=clientIp}function sdmzScan(){param.mac=$.id("sdmzMac").value;$.loadMain("sdmzScan.htm",param)}function chooseDis(){$.addClass($.id("p_dmz"),"nd");$.addClass($.id("p_sdmz"),"nd")}function chooseDMZ(){$.removeClass($.id("p_dmz"),"nd");$.addClass($.id("p_sdmz"),"nd")}function chooseSDMZ(){$.addClass($.id("p_dmz"),"nd");$.removeClass($.id("p_sdmz"),"nd")};</script>
+<p class="et">DMZ 설정</p>
+<div class="con1 L">
+<p class="ct"></p>
+<p class="bl"></p>
+<div class="con2">
+
+
+<p class="st">DMZ/스마트 DMZ</p>
+<p class="L2"><b class="item M T" id="t_status">DMZ Status:</b>
+<input name="dmz" id="dmz_dis" type="radio" onclick="chooseDis()" checked/><span>사용 안함</span>
+<input name="dmz" id="dmz_en" type="radio" onclick="chooseDMZ()"/><span>DMZ</span>
+<input name="dmz" id="sdmz_en" type="radio" onclick="chooseSDMZ()"/><span>스마트 DMZ</span>
+</p>
+<p class="br"></p>
+<p id="p_dmz" class="L2">
+	<b class="item M T" id="t_hostip">DMZ Host IP Address:</b>
+	<input type="text" class="text" size="15" maxlength="15" id="dmzIp" value="0.0.0.0"/>
+	<input id="cloneip" class="button T" style="width:150px" type="button" value="IP 주소를 복제" onclick="cloneIp();"/>
+</p>
+<div id="p_sdmz">
+<p class="L2">
+	<b class="item M T" id="t_hostmac">스마트 DMZ 호스트 MAC 주소:</b>
+	<input type="text" class="text" size="17" maxlength="17" id="sdmzMac" value="00:00:00:00:00:00"/>
+</p>
+<p class="L2">
+	<b class="item M T" id="blank">&nbsp;</b>
+	<input id="clonemac" class="button T" style="width:150px;margin-left:0px;" type="button" value="MAC 주소를 복제" onclick="cloneMac();"/>
+	<input id="scan" class="button T" style="width:150px" type="button" value="호스트 스캔" onclick="sdmzScan();"/>
+</p>
+</div>
+</div>
+<p class="bl"></p>
+<p class="tail" id="tail"><input type="button" class="button L T T_save" value="Save" id="saveBtn" onclick="doSubmit();" /></p>
+</div>
+<script language="javascript" type="text/javascript">$.loadHelpFrame("DMZHelpRpm.htm");init();</script>

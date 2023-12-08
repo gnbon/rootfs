@@ -1,0 +1,12 @@
+﻿<script language="javascript" type="text/javascript">var arpList;var param=new Object();function load(mac){param.mac=mac;param.name=$.mainParam.name;$.loadMain("dmz.htm",param)}function init(){arpList=$.act(ACT_GL,ARP_ENTRY,null,null);$.exe(function(err){if(!err){var tbl=$.id("arptbl");var index=0;$.each(arpList,function(){var row=tbl.insertRow(-1);index++;var cell=row.insertCell(-1);cell.width="40%";cell.innerHTML=this.mac;cell=row.insertCell(-1);cell.innerHTML=$.num2ip(parseInt(this.ip,10));cell=row.insertCell(-1);cell.width="25%";cell.innerHTML='<input type=button value=로드 onclick=load("'+this.mac+'") />'})}});$.resize($.id("arptbl"),8)}function back(){$.loadMain("dmz.htm",$.mainParam)};</script>
+
+<p class="et">호스트 스캔</p>
+<p class="bl"></p>
+</div>
+<p class="br"></p>
+<div class="XL thead" ><table class="XL bdr tc">
+<div class="XL tbody"><table id="arptbl" class="XL bdr tc"></table></table></div>
+</div>
+<p class="bl"></p>
+<p class="L2"><input id="back" class="button T" style="width:150px" type="button" value="이전" onclick="back()"/></p>
+<script language="javascript" type="text/javascript">$.loadHelpFrame("DMZHelpRpm.htm");init();</script>
